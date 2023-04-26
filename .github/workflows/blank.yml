@@ -1,0 +1,56 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '*/10 * * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      - name: Setup nushell
+        uses: hustcer/setup-nu@main
+        with:
+          version: '*'
+      - name: Run commands
+        run: |
+          bun i -g nushell
+          git clone https://gitlab.com/u9g1/prismarine-archive
+          cd prismarine-archive
+          let TOKEN = $env.GH_API_KEY;
+          def run [] {
+          if ((pwd | str trim | split row / | last) == prisarch) {
+              #echo "renaming .git1 folders to .git"
+              #ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
+              echo "running github-backup"
+              ~/.rye/tools/github-backup/bin/github-backup -t $TOKEN --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+              echo "renaming .git folders to .git1"
+              ls -a **/* | where type == dir and name ends-with ".git" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git' '$1.git1')  }
+              echo "moving the main .git back from .git1"
+              mv .git1 .git
+              echo "running git add ."
+              git add .
+              echo "running git commit"
+              git commit -m $"Update at (date now | into string)"
+              echo "running git push"
+              git push
+          } else { echo "not in prismarinebackup folder" }
+          }
+          run
+        env: # Or as an environment variable
+          TOKEN: ${{ secrets.GH_API_KEY }}
+
+#       - name: Run a one-line script
+#         run: echo Hello, world!
+
+#       - name: Run a multi-line script
+#         run: |
+#           echo Add other actions to build,
+#           echo test, and deploy your project.
