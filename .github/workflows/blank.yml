@@ -20,6 +20,7 @@ jobs:
         with:
           version: '*'
       - name: Run commands
+        shell: nu {0}
         run: |
           bun i -g nushell
           git clone https://gitlab.com/u9g1/prismarine-archive
