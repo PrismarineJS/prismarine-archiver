@@ -28,31 +28,42 @@ jobs:
           git config --global user.email "prismarine-archive@u9g.dev"
           git config --global user.name "prismarine-archive"
       - name: Run commands
-        shell: nu {0}
         run: |
           pip install git+https://github.com/U9G/python-github-backup.git#egg=github-backup
           git clone git@gitlab.com:PrismarineJS/prismarine-archive.git
           cd prismarine-archive
-          def run [] {
-            if ((pwd | str trim | split row / | last) == prismarine-archive) {
-                echo "renaming .git1 folders to .git"
-                ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
-                echo "running github-backup"
-                github-backup -t $env.GH_API_KEY --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
-                echo "renaming .git folders to .git1"
-                ls -a **/* | where type == dir and name ends-with ".git" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git' '$1.git1')  }
-                echo "moving the main .git back from .git1"
-                mv .git1 .git
-                echo "running git add ."
-                git add .
-                echo "running git commit"
-                git commit -m $"Update at (date now | into string)"
-                echo "running git push"
-                git push
-                git remote add codeberg git@codeberg.org:u9g/prismarine-archive.git
-                git push -u codeberg main
-            } else { echo "not in prismarinebackup folder" }
-          }
-          run
+
+          if [ "$(basename "$(pwd)")" == "prismarine-archive" ]; then
+              echo "renaming .git1 folders to .git"
+              find . -type d -name "*.git1" -print0 | while IFS= read -r -d '' dir; do
+                  mv "$dir" "${dir%.git1}.git"
+              done
+
+              echo "running github-backup"
+              github-backup -t "$GH_API_KEY" --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+
+              echo "renaming .git folders to .git1"
+              find . -type d -name "*.git" -print0 | while IFS= read -r -d '' dir; do
+                  mv "$dir" "${dir%.git}.git1"
+              done
+
+              echo "moving the main .git back from .git1"
+              mv .git1 .git
+
+              echo "running git add ."
+              git add .
+
+              echo "running git commit"
+              git commit -m "Update at $(date)"
+
+              echo "running git push"
+              git push
+
+              echo "adding codeberg remote and pushing"
+              git remote add codeberg git@codeberg.org:u9g/prismarine-archive.git
+              git push -u codeberg main
+          else
+              echo "not in prismarinebackup folder"
+          fi
         env: # Or as an environment variable
           GH_API_KEY: ${{ secrets.GH_API_KEY }}
