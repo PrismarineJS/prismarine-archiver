@@ -24,6 +24,8 @@ jobs:
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.GITLAB_PRIV_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H gitlab.com > ~/.ssh/known_hosts
+          git config --global user.email "prismarine-archive@u9g.dev"
+          git config --global user.name "prismarine-archive"
       - name: Run commands
         shell: nu {0}
         run: |
