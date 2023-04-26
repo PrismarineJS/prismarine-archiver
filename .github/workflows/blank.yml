@@ -15,10 +15,6 @@ jobs:
     steps:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
-      - name: Setup nushell
-        uses: hustcer/setup-nu@main
-        with:
-          version: '*'
       - name: Write SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
