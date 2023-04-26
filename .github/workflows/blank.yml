@@ -56,7 +56,7 @@ jobs:
               git push
 
               echo "adding codeberg remote and pushing"
-              git remote add codeberg git@codeberg.org:u9g/prismarine-archive.git
+              git remote add codeberg git@codeberg.org:PrismarineJS/prismarine-archive.git
               git push -u codeberg main
           else
               echo "not in prismarinebackup folder"
