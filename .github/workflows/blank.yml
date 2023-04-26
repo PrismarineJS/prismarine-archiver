@@ -29,7 +29,7 @@ jobs:
       - name: Run commands
         shell: nu {0}
         run: |
-          pip install git+https://github.com/u9g/python-github-backup.git#egg=github-backup
+          pip install git+https://github.com/PrismarineJS/python-github-backup.git#egg=github-backup
           git clone git@gitlab.com:u9g/prismarine-archive.git
           cd prismarine-archive
           def run [] {
