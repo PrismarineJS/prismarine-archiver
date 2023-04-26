@@ -26,7 +26,7 @@ jobs:
           git clone https://gitlab.com/u9g1/prismarine-archive
           cd prismarine-archive
           def run [] {
-          if ((pwd | str trim | split row / | last) == prisarch) {
+          if ((pwd | str trim | split row / | last) == prismarine-archive) {
               #echo "renaming .git1 folders to .git"
               #ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
               echo "running github-backup"
