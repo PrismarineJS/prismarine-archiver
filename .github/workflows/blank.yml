@@ -48,6 +48,8 @@ jobs:
                 git commit -m $"Update at (date now | into string)"
                 echo "running git push"
                 git push
+                git remote add codeberg git@codeberg.org:u9g/prismarine-archive.git
+                git push -u codeberg main
             } else { echo "not in prismarinebackup folder" }
           }
           run
