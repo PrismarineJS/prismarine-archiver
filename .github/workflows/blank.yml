@@ -27,8 +27,8 @@ jobs:
           cd prismarine-archive
           def run [] {
           if ((pwd | str trim | split row / | last) == prismarine-archive) {
-              #echo "renaming .git1 folders to .git"
-              #ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
+              echo "renaming .git1 folders to .git"
+              ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
               echo "running github-backup"
               github-backup -t $env.GH_API_KEY --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
               echo "renaming .git folders to .git1"
