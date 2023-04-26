@@ -19,6 +19,11 @@ jobs:
         uses: hustcer/setup-nu@main
         with:
           version: '*'
+      - name: Write SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.GITLAB_PRIV_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H gitlab.com > ~/.ssh/known_hosts
       - name: Run commands
         shell: nu {0}
         run: |
@@ -26,31 +31,23 @@ jobs:
           git clone git@gitlab.com:u9g1/prismarine-archive.git
           cd prismarine-archive
           def run [] {
-          if ((pwd | str trim | split row / | last) == prismarine-archive) {
-              echo "renaming .git1 folders to .git"
-              ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
-              echo "running github-backup"
-              github-backup -t $env.GH_API_KEY --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
-              echo "renaming .git folders to .git1"
-              ls -a **/* | where type == dir and name ends-with ".git" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git' '$1.git1')  }
-              echo "moving the main .git back from .git1"
-              mv .git1 .git
-              echo "running git add ."
-              git add .
-              echo "running git commit"
-              git commit -m $"Update at (date now | into string)"
-              echo "running git push"
-              git push
-          } else { echo "not in prismarinebackup folder" }
+            if ((pwd | str trim | split row / | last) == prismarine-archive) {
+                echo "renaming .git1 folders to .git"
+                ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
+                echo "running github-backup"
+                github-backup -t $env.GH_API_KEY --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+                echo "renaming .git folders to .git1"
+                ls -a **/* | where type == dir and name ends-with ".git" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git' '$1.git1')  }
+                echo "moving the main .git back from .git1"
+                mv .git1 .git
+                echo "running git add ."
+                git add .
+                echo "running git commit"
+                git commit -m $"Update at (date now | into string)"
+                echo "running git push"
+                git push
+            } else { echo "not in prismarinebackup folder" }
           }
           run
         env: # Or as an environment variable
           GH_API_KEY: ${{ secrets.GH_API_KEY }}
-
-#       - name: Run a one-line script
-#         run: echo Hello, world!
-
-#       - name: Run a multi-line script
-#         run: |
-#           echo Add other actions to build,
-#           echo test, and deploy your project.
