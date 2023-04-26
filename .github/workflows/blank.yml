@@ -24,13 +24,12 @@ jobs:
           bun i -g nushell
           git clone https://gitlab.com/u9g1/prismarine-archive
           cd prismarine-archive
-          let TOKEN = $env.GH_API_KEY;
           def run [] {
           if ((pwd | str trim | split row / | last) == prisarch) {
               #echo "renaming .git1 folders to .git"
               #ls -a **/* | where type == dir and name ends-with ".git1" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git1' '$1.git')  }
               echo "running github-backup"
-              ~/.rye/tools/github-backup/bin/github-backup -t $TOKEN --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+              ~/.rye/tools/github-backup/bin/github-backup -t $env.GH_API_KEY --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
               echo "renaming .git folders to .git1"
               ls -a **/* | where type == dir and name ends-with ".git" | each { |e| mv $e.name ($e.name | str replace '(.*)\.git' '$1.git1')  }
               echo "moving the main .git back from .git1"
