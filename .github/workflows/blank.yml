@@ -48,14 +48,14 @@ jobs:
               git add .
 
               echo "running git commit"
-              git commit -m "Update at $(date)"
+              git commit -m "Update at $(date)" || echo "nothing new"
 
               echo "running git push"
-              git push || echo "nothing new"
+              git push
 
               echo "adding codeberg remote and pushing"
               git remote add codeberg git@codeberg.org:PrismarineJS/prismarine-archive.git
-              git push -u codeberg main || echo "nothing new"
+              git push -u codeberg main
               curl -s https://api.val.town/eval/@u.refresher\(\"prismarine-archive\"\)
           else
               echo "not in prismarinebackup folder"
