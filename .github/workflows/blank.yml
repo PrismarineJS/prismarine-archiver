@@ -26,39 +26,34 @@ jobs:
           pip install git+https://github.com/U9G/python-github-backup.git#egg=github-backup
           git clone git@gitlab.com:PrismarineJS/prismarine-archive.git
           cd prismarine-archive
+          echo "renaming .git1 folders to .git"
+          find . -type d -name "*.git1" -print0 | while IFS= read -r -d '' dir; do
+              mv "$dir" "${dir%.git1}.git"
+          done
 
-          if [ "$(basename "$(pwd)")" == "prismarine-archive" ]; then
-              echo "renaming .git1 folders to .git"
-              find . -type d -name "*.git1" -print0 | while IFS= read -r -d '' dir; do
-                  mv "$dir" "${dir%.git1}.git"
-              done
+          echo "running github-backup"
+          github-backup -t "$GH_API_KEY" --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
 
-              echo "running github-backup"
-              github-backup -t "$GH_API_KEY" --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+          echo "renaming .git folders to .git1"
+          find . -type d -name "*.git" -print0 | while IFS= read -r -d '' dir; do
+              mv "$dir" "${dir%.git}.git1"
+          done
 
-              echo "renaming .git folders to .git1"
-              find . -type d -name "*.git" -print0 | while IFS= read -r -d '' dir; do
-                  mv "$dir" "${dir%.git}.git1"
-              done
+          echo "moving the main .git back from .git1"
+          mv .git1 .git
 
-              echo "moving the main .git back from .git1"
-              mv .git1 .git
+          echo "running git add ."
+          git add .
 
-              echo "running git add ."
-              git add .
+          echo "running git commit"
+          git commit -m "Update at $(date)" || echo "nothing new"
 
-              echo "running git commit"
-              git commit -m "Update at $(date)" || echo "nothing new"
+          echo "running git push"
+          git push
 
-              echo "running git push"
-              git push
-
-              echo "adding codeberg remote and pushing"
-              git remote add codeberg git@codeberg.org:PrismarineJS/prismarine-archive.git
-              git push -u codeberg main
-              curl -s https://api.val.town/eval/@u.refresher\(\"prismarine-archive\"\)
-          else
-              echo "not in prismarinebackup folder"
-          fi
+          echo "adding codeberg remote and pushing"
+          git remote add codeberg git@codeberg.org:PrismarineJS/prismarine-archive.git
+          git push -u codeberg main
+          curl -s https://api.val.town/eval/@u.refresher\(\"prismarine-archive\"\)
         env: # Or as an environment variable
           GH_API_KEY: ${{ secrets.GH_API_KEY }}
