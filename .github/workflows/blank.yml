@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Disarm alert alarm
+        run: |
+          curl -s https://api.val.town/eval/@u.refresher\(\"prismarine-archive\"\)
       - name: Write SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -51,6 +54,5 @@ jobs:
           echo "adding codeberg remote and pushing"
           git remote add codeberg git@codeberg.org:PrismarineJS/prismarine-archive.git
           git push -u codeberg main
-          curl -s https://api.val.town/eval/@u.refresher\(\"prismarine-archive\"\)
         env: # Or as an environment variable
           GH_API_KEY: ${{ secrets.GH_API_KEY }}
