@@ -32,7 +32,7 @@ jobs:
           done
 
           echo "running github-backup"
-          github-backup -t "$GH_API_KEY" --as-app -o . --pull-details --gists --starred-gists -i --exclude prismarine-web-client --all PrismarineJS
+          github-backup -t "$GH_API_KEY" --as-app -o . --pull-details --gists --starred-gists -i --all PrismarineJS
 
           echo "renaming .git folders to .git1"
           find . -type d -name "*.git" -print0 | while IFS= read -r -d '' dir; do
